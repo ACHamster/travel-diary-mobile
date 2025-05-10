@@ -11,6 +11,9 @@ importers:
       '@babel/runtime':
         specifier: ^7.24.4
         version: 7.27.1
+      '@taroify/icons':
+        specifier: ^0.8.0
+        version: 0.8.0(@tarojs/components@4.0.12(@tarojs/helper@4.0.12)(@types/react@18.3.21)(postcss@8.5.3)(react@18.3.1)(rollup@3.29.5))
       '@tarojs/components':
         specifier: 4.0.12
         version: 4.0.12(@tarojs/helper@4.0.12)(@types/react@18.3.21)(postcss@8.5.3)(react@18.3.1)(rollup@3.29.5)
@@ -1624,6 +1627,11 @@ packages:
 
   '@tailwindcss-mangle/shared@4.1.0':
     resolution: {integrity: sha512-HJN3yFDaG9D4bXlVLhPBcUpy6ddKET35LewWsqUR1RcjeTmHfcmbiQKjIN4p82Yl9GzsfrM1TsyEc+PCjO/TcQ==}
+
+  '@taroify/icons@0.8.0':
+    resolution: {integrity: sha512-Derd4CffV4cX1efW68QrkpMWzay7BXMu7ZyfRCINwQpBVpPVhbOuckWH/wujl3z8MVa6nT3nbJjm/XOEwGlvPw==}
+    peerDependencies:
+      '@tarojs/components': '>=3'
 
   '@tarojs/api@4.0.12':
     resolution: {integrity: sha512-yBc2epLYwAxCutUyIpbGREkDfe81VLo7RzsfA+SAUs77MCGRvCf69hzbadbG1axnF17Iw3FGvmQCFfYbFG7Vhg==}
@@ -6920,6 +6928,11 @@ snapshots:
       - magicast
 
   '@tailwindcss-mangle/shared@4.1.0': {}
+
+  '@taroify/icons@0.8.0(@tarojs/components@4.0.12(@tarojs/helper@4.0.12)(@types/react@18.3.21)(postcss@8.5.3)(react@18.3.1)(rollup@3.29.5))':
+    dependencies:
+      '@tarojs/components': 4.0.12(@tarojs/helper@4.0.12)(@types/react@18.3.21)(postcss@8.5.3)(react@18.3.1)(rollup@3.29.5)
+      classnames: 2.5.1
 
   '@tarojs/api@4.0.12(@tarojs/runtime@4.0.12)(@tarojs/shared@4.0.12)':
     dependencies:
