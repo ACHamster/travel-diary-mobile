@@ -13,7 +13,8 @@ const requestInterceptor = function (chain) {
   }
 
   // 添加token
-  const token = Taro.getStorageSync('token')
+  const token = Taro.getStorageSync('token');
+  console.log(token);
   if (token) {
     newHeader['Authorization'] = `Bearer ${token}`
   }
@@ -29,7 +30,6 @@ const responseInterceptor = function (chain) {
   const requestParams = chain.requestParams
 
   return chain.proceed(requestParams).then(async res => {
-    console.log('重试')
     // 检查是否是401/403且未重试过，并且不是刷新token的请求本身
     if (
       (res.statusCode === 401 || res.statusCode === 403 || res.data?.statusCode === 401) &&
@@ -55,18 +55,20 @@ const responseInterceptor = function (chain) {
         })
 
         // 检查刷新结果
-        if (refreshRes.statusCode === 200 && refreshRes.data?.data?.token) {
+        if (refreshRes.statusCode === 200 && refreshRes.data?.token) {
           // 保存新token
-          Taro.setStorageSync('token', refreshRes.data.data.token)
+          Taro.setStorageSync('token', refreshRes.data.token);
+          Taro.setStorageSync('refreshToken', refreshRes.data.refreshToken);
 
-          // 使用新token重试原请求
-          return request({
+          // 使用新token重试原请求并等待结果
+          const retryRes = await request({
             ...requestParams,
             header: {
               ...requestParams.header,
               'Authorization': `Bearer ${refreshRes.data.data.token}`
             }
           })
+          return retryRes.data
         } else {
           throw new Error('Token refresh failed')
         }

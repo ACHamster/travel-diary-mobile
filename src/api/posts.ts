@@ -50,11 +50,12 @@ export const fetchPostById = async (id: string | number): Promise<PostResponse> 
 export const createPost = async (data: {
   title: string
   content: string
-  coverImage?: string
-  tags?: string[]
+  coverImage: string
+  images: string[]
+  video?: string
 }): Promise<PostResponse> => {
   try {
-    const res = await post('/posts/create', data)
+    const res = await post('/posts', data)
     return { success: true, data: res.data }
   } catch (error) {
     return { success: false, error }
