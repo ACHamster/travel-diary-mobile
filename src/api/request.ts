@@ -1,6 +1,18 @@
 import Taro from '@tarojs/taro'
 import { BASE_URL } from '../config'
 
+// 定义刷新令牌接口的返回数据类型
+interface RefreshResponse {
+  message: string;
+  user: {
+    id: number;
+    username: string;
+    email: string;
+  };
+  token: string;
+  refreshToken: string;
+}
+
 // 请求拦截器
 const requestInterceptor = function (chain) {
   const requestParams = chain.requestParams
@@ -45,7 +57,7 @@ const responseInterceptor = function (chain) {
           throw new Error('No refresh token')
         }
 
-        const refreshRes = await Taro.request({
+        const refreshRes = await Taro.request<RefreshResponse>({
           url: `${BASE_URL}/auth/refresh`,
           method: 'POST',
           data: { refreshToken },
@@ -54,25 +66,27 @@ const responseInterceptor = function (chain) {
           }
         })
 
-        console.log('refresh res',refreshRes);
+        console.log('refresh res', refreshRes);
 
         // 检查刷新结果
-        console.log(refreshRes.token);
-        if (refreshRes.statusCode === 201 && refreshRes?.token) {
-          console.log('refresh res',refreshRes.data);
+        const refreshData = refreshRes;
+
+        if (refreshData?.token) {
+          console.log('refresh res', refreshData);
           // 保存新token
-          Taro.setStorageSync('token', refreshRes.data.token);
-          Taro.setStorageSync('refreshToken', refreshRes.data.refreshToken);
-          Taro.setStorageSync('userInfo', res.data.user);
+          Taro.setStorageSync('token', refreshData.token);
+          Taro.setStorageSync('refreshToken', refreshData.refreshToken);
+          Taro.setStorageSync('userInfo', refreshData.user);
           // 保存用户ID，方便后续获取完整信息
-          Taro.setStorageSync('userId', res.data.user.id);
+          Taro.setStorageSync('userId', refreshData.user.id);
 
           // 使用新token重试原请求并等待结果
           const retryRes = await request({
             ...requestParams,
+            url: requestParams.url.replace(BASE_URL, ''),
             header: {
               ...requestParams.header,
-              'Authorization': `Bearer ${refreshRes.data.data.token}`
+              'Authorization': `Bearer ${refreshData.token}`
             }
           })
           return retryRes.data
@@ -151,3 +165,4 @@ export const del = (url: string, data?: any) => {
     data
   })
 }
+

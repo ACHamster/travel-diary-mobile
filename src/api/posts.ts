@@ -48,11 +48,13 @@ export const fetchPostById = async (id: string | number): Promise<PostResponse> 
 
 // 创建游记
 export const createPost = async (data: {
-  title: string
-  content: string
-  coverImage: string
-  images: string[]
-  video?: string
+  id: string | undefined;
+  title: string;
+  content: string;
+  coverImage: string;
+  images: string[];
+  video: string | undefined;
+  quickTag: number | undefined
 }): Promise<PostResponse> => {
   try {
     const res = await post('/posts', data)

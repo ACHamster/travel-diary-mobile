@@ -5,12 +5,14 @@ import { useState } from 'react'
 import { fetchMyPosts, deletePost } from '../../api/posts'
 import TabBar from '../../components/TabBar'
 import MyPostCard from '../../components/MyPostCard'
+import {Lines} from "../../lib/quick-tag";
 
 interface Post {
   id: string
   title: string
   date: string
   images: string[]
+  quickTag: Lines
   auditStatus: 'pending' | 'approved' | 'rejected'
   rejectReason?: string | null
   viewCount: number
@@ -66,8 +68,7 @@ export default function MyPosts() {
 
   // 处理编辑游记
   const handleEdit = (id: string) => {
-    // 这里可以跳转到编辑页面，暂时先提示功能开发中
-    Taro.showToast({ title: '编辑功能开发中', icon: 'none' })
+    Taro.navigateTo({ url: `/pages/post-edit/index?id=${id}` })
   }
 
   return (
@@ -87,7 +88,7 @@ export default function MyPosts() {
               key={post.id}
               post={post}
               onDelete={handleDelete}
-              onEdit={handleEdit}
+              onEdit={() => handleEdit(post.id)}
             />
           ))
         ) : (

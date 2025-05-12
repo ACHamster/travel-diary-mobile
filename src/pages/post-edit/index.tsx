@@ -1,12 +1,25 @@
 import { View, Text, Input, Textarea, Button, Image, Video } from '@tarojs/components'
-import CryptoJS from 'crypto-js';
 import { useState } from 'react'
 import Taro, { useLoad } from '@tarojs/taro'
 import { BASE_URL } from '../../config';
-import { createPost, updatePost } from '../../api/posts'
+import { createPost } from '../../api/posts'
+import { get } from "../../api/request";
+import {Lines, mergeLines, NoLine, PendingLine, removeLine, VideoLine} from "../../lib/quick-tag";
 
 
 interface FormData {
+  id?: string;
+  title: string;
+  content: string;
+  images: string[];
+  video?: string;
+  coverImage?: string;
+  quickTag: Lines;
+}
+
+interface PostResponse {
+  quickTag: Lines;
+  success: boolean;
   title: string;
   content: string;
   images: string[];
@@ -14,22 +27,18 @@ interface FormData {
   coverImage?: string;
 }
 
-interface ExistFile {
-  id?: number;
-  file_name?: string;
-  file_path?: string;
-  sha1?: string;
-  size?: string;
-}
-
 export default function PostEdit() {
   const [formData, setFormData] = useState<FormData>({
     title: '',
     content: '',
-    images: []
+    images: [],
+    quickTag: NoLine,
   })
   const [errors, setErrors] = useState<{[key: string]: string}>({})
   const [isSubmitting, setIsSubmitting] = useState(false)
+
+
+
 
   // 检查登录状态
   useLoad(() => {
@@ -42,20 +51,45 @@ export default function PostEdit() {
       Taro.navigateTo({ url: '/pages/login/index' })
     }
   })
+
+
+  useLoad(async (options) => {
+    if (options.id) {
+      try {
+        const res = (await get(`/posts/${options.id}`)) as unknown as PostResponse;
+        if (res) {
+          setFormData({
+            id: options.id,
+            title: res.title || '',
+            content: res.content || '',
+            images: res.images || [],
+            video: res.video || undefined,
+            coverImage: res.coverImage || undefined, // 如果需要封面图
+            quickTag: res.quickTag,
+          });
+        }else {
+          Taro.showToast({ title: '加载失败', icon: 'none' })
+        }
+      } catch (error) {
+        console.error('加载游记失败:', error)
+        Taro.showToast({ title: '加载失败', icon: 'none' })
+      }
+    }
+  })
   // 计算文件的 SHA1 哈希值
 
 
-  const calculateFileSha1 = async (filePath: string): Promise<string> => {
-    try {
-      const fileContent = await Taro.getFileSystemManager().readFileSync(filePath, 'binary');
-      const wordArray = CryptoJS.lib.WordArray.create(fileContent);
-      const hash = CryptoJS.SHA1(wordArray).toString();
-      console.log('File SHA1:', hash);
-      return hash;
-    } catch (error) {
-      throw new Error('计算文件哈希值失败');
-    }
-  };
+  // const calculateFileSha1 = async (filePath: string): Promise<string> => {
+  //   try {
+  //     const fileContent = await Taro.getFileSystemManager().readFileSync(filePath, 'binary');
+  //     const wordArray = CryptoJS.lib.WordArray.create(fileContent);
+  //     const hash = CryptoJS.SHA1(wordArray).toString();
+  //     console.log('File SHA1:', hash);
+  //     return hash;
+  //   } catch (error) {
+  //     throw new Error('计算文件哈希值失败');
+  //   }
+  // };
 
   // 表单验证
   const validate = () => {
@@ -86,18 +120,6 @@ export default function PostEdit() {
 
       const uploadedImages = await Promise.all(
         res.tempFilePaths.map(async (path) => {
-          const sha1 = await calculateFileSha1(path);
-          const existFile = await Taro.request<{ data: ExistFile | null }>({
-            url: `${BASE_URL}/oss-archive/exist`,
-            method: 'POST',
-            data: { sha1 },
-          })
-
-          if(existFile) {
-            console.log('existFile', existFile)
-            return (existFile as ExistFile).file_path;
-          }
-
           const uploadRes = await Taro.uploadFile({
             url: `${BASE_URL}/storage/upload`,
             filePath: path,
@@ -142,6 +164,7 @@ export default function PostEdit() {
         ...prev,
         video: videoUrl,
         coverImage: videoCoverUrl,
+        quickTag: mergeLines(formData.quickTag, VideoLine),
       }))
     } catch (error) {
       console.error('Upload video error:', error)
@@ -164,7 +187,8 @@ export default function PostEdit() {
   const handleDeleteVideo = () => {
     setFormData(prev => ({
       ...prev,
-      video: undefined
+      video: undefined,
+      quickTag: removeLine(formData.quickTag, VideoLine),
     }))
   }
 
@@ -182,12 +206,13 @@ export default function PostEdit() {
     setIsSubmitting(true)
     try {
       const res = await createPost({
+        id: formData.id,
         title: formData.title,
         content: formData.content,
         coverImage: formData.coverImage || formData.images[0],
         images: formData.images,
         video: formData.video,
-
+        quickTag: mergeLines(formData.quickTag, PendingLine),
       })
 
       if (res.success) {

@@ -1,8 +1,11 @@
 import {View, Image, Text, Icon} from '@tarojs/components'
 import Taro from '@tarojs/taro'
+import camIcon from '../../icons/videocam.png'
+import {includeSomeLine, Lines, VideoLine} from "../../lib/quick-tag";
 
 interface PostCardProps {
   post: {
+    quickTag: Lines
     id: string
     title: string
     date: string
@@ -32,11 +35,20 @@ export default function PostCard({ post }: PostCardProps) {
   return (
     <View className='w-full mb-4 bg-white' onClick={handlePostClick}>
       {/* 游记封面图 */}
-      <Image
-        src={post.coverImage || post.images[0]}
-        className='w-full aspect-square rounded-t-lg object-cover mb-2'
-        mode='aspectFill'
-      />
+      <View className='relative'>
+        <Image
+          src={post.coverImage || post.images[0]}
+          className='w-full aspect-square rounded-t-lg object-cover mb-2'
+          mode='aspectFill'
+        />
+        {includeSomeLine(post.quickTag, VideoLine) && (
+          <Image
+            src={camIcon}
+            className='absolute top-2 right-2 w-5 h-5'
+            mode='aspectFit'
+          />
+        )}
+      </View>
 
       {/* 标题区域 */}
       <View className='px-1 mb-2'>
