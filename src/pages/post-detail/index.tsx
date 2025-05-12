@@ -42,18 +42,8 @@ export default function PostDetail() {
 
   return (
     <View className='post-detail'>
-      {post.video && (
-        <View className='post-video'>
-          <Video
-            src={post.video}
-            controls
-            autoplay={false}
-            className='w-full rounded'
-          />
-        </View>
-      )}
-      {/* 图片轮播 */}
-      {post.images && post.images.length > 0 && (
+      {/* 图片轮播，视频作为第一个 */}
+      {(post.video || (post.images && post.images.length > 0)) && (
         <Swiper
           className='post-images'
           indicatorDots
@@ -62,8 +52,19 @@ export default function PostDetail() {
           indicatorColor='#999'
           indicatorActiveColor='#333'
         >
+          {post.video && (
+            <SwiperItem className='flex items-center'>
+              <Video
+                src={post.video}
+                controls
+                showFullscreenBtn
+                autoplay={false}
+                className='w-full rounded'
+              />
+            </SwiperItem>
+          )}
           {post.images.map((image, index) => (
-            <SwiperItem key={index}>
+            <SwiperItem key={index} className='flex items-center'>
               <Image
                 mode='aspectFill'
                 className='post-image'
