@@ -1,5 +1,7 @@
-import { View, Image, Text } from '@tarojs/components'
-import { DeleteOutlined, WarningOutlined, EyeOutlined } from '@taroify/icons'
+import {View, Image, Text, Video} from '@tarojs/components'
+// import { DeleteOutlined, WarningOutlined, EyeOutlined } from '@taroify/icons'
+import editIcon from '../../icons/edit.png';
+import deleteIcon from '../../icons/delete.png';
 
 interface MyPostCardProps {
   post: {
@@ -7,6 +9,7 @@ interface MyPostCardProps {
     title: string
     date: string
     images: string[]
+    video?: string
     auditStatus: 'pending' | 'approved' | 'rejected'
     rejectReason?: string | null
     viewCount: number
@@ -35,13 +38,23 @@ export default function MyPostCard({ post, onDelete, onEdit }: MyPostCardProps) 
   return (
     <View className='w-full mb-4 bg-white rounded-lg shadow-sm overflow-hidden'>
       <View className='relative'>
-        {/* 游记封面图 */}
-        <Image
-          src={post.images && post.images.length > 0 ? post.images[0] : ''}
-          className='w-full aspect-[3/2] object-cover'
-          mode='aspectFill'
-        />
-
+        {/* 游记封面图或视频 */}
+        {post.video ? (
+          <Video
+            src={post.video}
+            className='w-full aspect-[3/2] object-cover'
+            controls
+            autoplay={false}
+            loop={false}
+            muted={false}
+          />
+        ) : (
+          <Image
+            src={post.images && post.images.length > 0 ? post.images[0] : ''}
+            className='w-full aspect-[3/2] object-cover'
+            mode='aspectFill'
+          />
+        )}
         {/* 状态标签 */}
         <View className={`absolute top-2 right-2 px-2 py-1 rounded-full ${currentStatus.color} text-xs`}>
           {currentStatus.text}
@@ -58,7 +71,7 @@ export default function MyPostCard({ post, onDelete, onEdit }: MyPostCardProps) 
         {/* 拒绝原因（仅在被拒绝时显示） */}
         {post.auditStatus === 'rejected' && post.rejectReason && (
           <View className='mb-3 flex items-start bg-gray-50 p-2 rounded'>
-            <WarningOutlined className='text-red-500 mr-1 mt-0.5 flex-shrink-0' />
+            {/*<WarningOutlined className='text-red-500 mr-1 mt-0.5 flex-shrink-0' />*/}
             <Text className='text-xs text-gray-600'>拒绝原因：{post.rejectReason}</Text>
           </View>
         )}
@@ -69,7 +82,7 @@ export default function MyPostCard({ post, onDelete, onEdit }: MyPostCardProps) 
           <View className='flex items-center'>
             <Text className='text-xs text-gray-400'>{formatDate(post.date)}</Text>
             <View className='flex items-center ml-3'>
-              <EyeOutlined size='12' className='text-gray-400' />
+
               <Text className='text-xs text-gray-400 ml-1'>{post.viewCount}</Text>
             </View>
           </View>
@@ -77,16 +90,16 @@ export default function MyPostCard({ post, onDelete, onEdit }: MyPostCardProps) 
           {/* 操作按钮 */}
           <View className='flex items-center'>
             <View
-              className='mr-3 p-1 rounded-full bg-gray-100'
+              className='mr-3 w-5 h-5 rounded-full bg-gray-100 flex items-center justify-center'
               onClick={() => onEdit(post.id)}
             >
-              {/*<EditOutlined size='16' className='text-gray-600' />*/}
+              <Image src={editIcon} className='w-4 h-4' />
             </View>
             <View
-              className='p-1 rounded-full bg-gray-100'
+              className='mr-3 w-5 h-5 rounded-full bg-gray-100 flex items-center justify-center'
               onClick={() => onDelete(post.id)}
             >
-              <DeleteOutlined size='16' className='text-gray-600' />
+              <Image src={deleteIcon} className='w-4 h-4' />
             </View>
           </View>
         </View>

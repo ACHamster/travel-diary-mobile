@@ -54,11 +54,18 @@ const responseInterceptor = function (chain) {
           }
         })
 
+        console.log('refresh res',refreshRes);
+
         // 检查刷新结果
-        if (refreshRes.statusCode === 200 && refreshRes.data?.token) {
+        console.log(refreshRes.token);
+        if (refreshRes.statusCode === 201 && refreshRes?.token) {
+          console.log('refresh res',refreshRes.data);
           // 保存新token
           Taro.setStorageSync('token', refreshRes.data.token);
           Taro.setStorageSync('refreshToken', refreshRes.data.refreshToken);
+          Taro.setStorageSync('userInfo', res.data.user);
+          // 保存用户ID，方便后续获取完整信息
+          Taro.setStorageSync('userId', res.data.user.id);
 
           // 使用新token重试原请求并等待结果
           const retryRes = await request({

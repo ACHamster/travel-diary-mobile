@@ -1,10 +1,11 @@
-import { View, Text } from '@tarojs/components'
+import {View, Text, Image} from '@tarojs/components'
 import Taro, { useDidShow } from '@tarojs/taro'
 import { useState } from 'react'
 import { updateLocalUserInfo } from '../../api/user'
 import type { UserInfo } from '../../api/auth'
-// import { FileOutlined } from '@taroify/icons'
 import TabBar from '../../components/TabBar'
+import settingIcon from '../../icons/settings.png'
+import articleIcon from '../../icons/article.png'
 
 export default function Profile() {
   const [userInfo, setUserInfo] = useState<UserInfo | null>(null)
@@ -102,24 +103,15 @@ export default function Profile() {
           className='flex items-center p-4 active:bg-gray-50'
           onClick={navigateToMyPosts}
         >
-          <View className='flex items-center justify-center w-8 h-8 rounded-full bg-blue-50 mr-3'>
-            {/*<FileOutlined size='20' className='text-blue-500' />*/}
-          </View>
+          <Image src={articleIcon} className='w-5 h-5 mr-2' />
           <View className='flex-1'>
             <Text className='text-base'>我的游记</Text>
           </View>
-          <Text className='text-gray-400'>&gt;</Text>
-        </View>
-        <View className='p-4 flex justify-between items-center border-b border-gray-100'>
-          <View className='flex items-center'>
-            <View className='text-blue-500 text-xl mr-3'>⭐️</View>
-            <View>我的收藏</View>
-          </View>
-          <View className='text-gray-400'>❯</View>
+          <Text className='text-gray-400'>❯</Text>
         </View>
         <View className='p-4 flex justify-between items-center'>
           <View className='flex items-center'>
-            <View className='text-blue-500 text-xl mr-3'>⚙️</View>
+            <Image src={settingIcon} className='w-5 h-5' />
             <View>设置</View>
           </View>
           <View className='text-gray-400'>❯</View>

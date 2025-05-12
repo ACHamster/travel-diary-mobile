@@ -8,6 +8,7 @@ interface PostCardProps {
     date: string
     images: string[]
     viewCount: number
+    coverImage?: string
     author: {
       avatar: string
       username: string
@@ -32,7 +33,7 @@ export default function PostCard({ post }: PostCardProps) {
     <View className='w-full mb-4 bg-white' onClick={handlePostClick}>
       {/* 游记封面图 */}
       <Image
-        src={post.images[0]}
+        src={post.coverImage || post.images[0]}
         className='w-full aspect-square rounded-t-lg object-cover mb-2'
         mode='aspectFill'
       />
