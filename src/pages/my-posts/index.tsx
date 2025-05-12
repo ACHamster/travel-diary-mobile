@@ -27,7 +27,6 @@ export default function MyPosts() {
     setLoading(true)
     try {
       const res = await fetchMyPosts();
-      console.log(res);
       if (res.success && res.data) {
         setPosts(res.data)
       } else {

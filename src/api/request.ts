@@ -26,7 +26,6 @@ const requestInterceptor = function (chain) {
 
   // 添加token
   const token = Taro.getStorageSync('token');
-  console.log(token);
   if (token) {
     newHeader['Authorization'] = `Bearer ${token}`
   }

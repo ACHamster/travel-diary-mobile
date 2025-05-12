@@ -39,8 +39,8 @@ export const fetchMyPosts = async (): Promise<PostResponse> => {
 // 获取单篇游记详情
 export const fetchPostById = async (id: string | number): Promise<PostResponse> => {
   try {
-    const res = await get(`/posts/${id}`)
-    return { success: true, data: res.data }
+    const res = await get(`/posts/${id}`);
+    return { success: true, data: res }
   } catch (error) {
     return { success: false, error }
   }
@@ -48,13 +48,10 @@ export const fetchPostById = async (id: string | number): Promise<PostResponse> 
 
 // 创建游记
 export const createPost = async (data: {
-  id: string | undefined;
-  title: string;
-  content: string;
-  coverImage: string;
-  images: string[];
-  video: string | undefined;
-  quickTag: number | undefined
+  title: string
+  content: string
+  coverImage?: string
+  tags?: string[]
 }): Promise<PostResponse> => {
   try {
     const res = await post('/posts', data)
