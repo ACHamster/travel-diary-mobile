@@ -3,6 +3,7 @@ import { View, Text, Image, Swiper, SwiperItem, Video } from '@tarojs/components
 import { useLoad } from '@tarojs/taro'
 import { get } from '../../api/request'
 import './index.css'
+import {addUserHistory} from "../../api/user";
 
 interface Author {
   id: number
@@ -28,7 +29,8 @@ export default function PostDetail() {
   useLoad(async (options) => {
     if (options.id) {
       try {
-        const res = await get(`/posts/${options.id}`)
+        const res = await get(`/posts/${options.id}`);
+        await addUserHistory(options.id);
         setPost(res as unknown as Post);
       } catch (error) {
         console.error('Failed to fetch post:', error)

@@ -5,7 +5,8 @@ export default defineAppConfig({
     'pages/login/index',
     'pages/my-posts/index',
     'pages/post-detail/index',
-    'pages/post-edit/index'
+    'pages/post-edit/index',
+    'pages/my-history/index',
   ],
   window: {
     backgroundTextStyle: 'light',

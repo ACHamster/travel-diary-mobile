@@ -1,6 +1,6 @@
 import Taro from '@tarojs/taro'
 import type { UserInfo } from './auth'
-import { get } from './request'
+import {get, post} from './request'
 
 interface UserResponse {
   success: boolean
@@ -38,5 +38,27 @@ export const updateLocalUserInfo = async (): Promise<UserResponse> => {
     return await getUserInfo(userId)
   } catch (error) {
     return { success: false, error }
+  }
+}
+
+// 获取用户访问过的游记ID
+export const getUserHistory = async (): Promise<{ success: boolean; data?: any[]; error?: any }> => {
+  try {
+    const res = await get('/user-history/detailed');
+    console.log(res);
+    return { success: true, data: res };
+  } catch (error) {
+    return { success: false, error };
+  }
+};
+
+
+export const addUserHistory = async (recordId: string): Promise<{ success: boolean; error?: any }> => {
+  try {
+    console.log(recordId);
+    await post('/user-history', { data: { recordId } });
+    return { success: true };
+  } catch (error) {
+    return { success: false, error };
   }
 }
