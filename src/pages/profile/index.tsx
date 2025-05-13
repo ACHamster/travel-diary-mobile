@@ -7,6 +7,7 @@ import TabBar from '../../components/TabBar'
 import settingIcon from '../../icons/settings.png'
 import articleIcon from '../../icons/article.png'
 import historyIcon from '../../icons/history.png'
+import favoriteIcon from '../../icons/favorite.png'
 
 export default function Profile() {
   const [userInfo, setUserInfo] = useState<UserInfo | null>(null)
@@ -56,6 +57,10 @@ export default function Profile() {
 
   const navigateToMyHistory = () => {
     Taro.navigateTo({ url: '/pages/my-history/index' })
+  }
+
+  const navigateToFavorites = () => {
+    Taro.navigateTo({ url: '/pages/my-favorite/index' })
   }
 
   return (
@@ -111,6 +116,16 @@ export default function Profile() {
           <Image src={articleIcon} className='w-5 h-5 mr-2' />
           <View className='flex-1'>
             <Text className='text-base'>我的游记</Text>
+          </View>
+          <Text className='text-gray-400'>❯</Text>
+        </View>
+        <View
+          className='flex items-center p-4 active:bg-gray-50'
+          onClick={navigateToFavorites}
+        >
+          <Image src={favoriteIcon} className='w-5 h-5 mr-2' />
+          <View className='flex-1'>
+            <Text className='text-base'>我的收藏</Text>
           </View>
           <Text className='text-gray-400'>❯</Text>
         </View>

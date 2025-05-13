@@ -45,7 +45,16 @@ export const updateLocalUserInfo = async (): Promise<UserResponse> => {
 export const getUserHistory = async (): Promise<{ success: boolean; data?: any[]; error?: any }> => {
   try {
     const res = await get('/user-history/detailed');
-    console.log(res);
+    return { success: true, data: res };
+  } catch (error) {
+    return { success: false, error };
+  }
+};
+
+// 获取用户收藏
+export const getUserFavorites = async (): Promise<{ success: boolean; data?: any[]; error?: any }> => {
+  try {
+    const res = await get('/user-favorites/detailed');
     return { success: true, data: res };
   } catch (error) {
     return { success: false, error };

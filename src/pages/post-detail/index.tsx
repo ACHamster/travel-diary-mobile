@@ -44,10 +44,14 @@ export default function PostDetail() {
 
   return (
     <View className='post-detail'>
+      <View className='w-full flex items-center'>
+        <Image src={post.author.avatar} className='w-6 h-6 rounded-full' />
+        <View className='font-xl ml-4'>{post.author.username}</View>
+      </View>
       {/* 图片轮播，视频作为第一个 */}
       {(post.video || (post.images && post.images.length > 0)) && (
         <Swiper
-          className='post-images'
+          className='post-images max-h-[80vh]'
           indicatorDots
           circular
           autoplay={false}
@@ -78,17 +82,15 @@ export default function PostDetail() {
       )}
 
       {/* 作者信息 */}
-      <View className='author-info'>
-        <View className='author-name'>{post.author.username}</View>
-        <View className='post-date'>
-          {new Date(post.date).toLocaleDateString('zh-CN')}
-        </View>
-      </View>
+
 
       {/* 标题和内容 */}
       <View className='post-content'>
         <Text className='post-title'>{post.title}</Text>
         <Text className='post-text'>{post.content}</Text>
+      </View>
+      <View className='post-date px-2'>
+        {new Date(post.date).toLocaleDateString('zh-CN')}
       </View>
     </View>
   )
