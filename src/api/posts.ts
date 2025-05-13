@@ -17,7 +17,7 @@ export const fetchPosts = async (params?: { page?: number; pageSize?: number }):
 }
 
 // 获取已审核的游记列表
-export const fetchApprovedPosts = async (params?: { page?: number; pageSize?: number }): Promise<PostResponse> => {
+export const fetchApprovedPosts = async (params?: { page?: number; limit?: number }): Promise<PostResponse> => {
   try {
     const res = await get('/posts/list/approved', params);
     return { success: true, data: res }
@@ -53,6 +53,7 @@ export const createPost = async (data: {
   coverImage?: string
   tags?: string[]
 }): Promise<PostResponse> => {
+  console.log('Creating post with data:', data)
   try {
     const res = await post('/posts', data)
     return { success: true, data: res.data }

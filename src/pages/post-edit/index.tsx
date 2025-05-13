@@ -5,6 +5,8 @@ import { BASE_URL } from '../../config';
 import { createPost } from '../../api/posts'
 import { get } from "../../api/request";
 import {Lines, mergeLines, NoLine, PendingLine, removeLine, VideoLine} from "../../lib/quick-tag";
+import locationIcon from '../../icons/pin_drop.png'
+import LocationPicker from "../../components/LocationPicker";
 
 
 interface FormData {
@@ -15,6 +17,7 @@ interface FormData {
   video?: string;
   coverImage?: string;
   quickTag: Lines;
+  location?: { province: string; city: string };
 }
 
 interface PostResponse {
@@ -25,6 +28,7 @@ interface PostResponse {
   images: string[];
   video?: string;
   coverImage?: string;
+  location?: string;
 }
 
 export default function PostEdit() {
@@ -66,7 +70,9 @@ export default function PostEdit() {
             video: res.video || undefined,
             coverImage: res.coverImage || undefined, // 如果需要封面图
             quickTag: res.quickTag,
+            location: res.location ? JSON.parse(res.location) : undefined,
           });
+          console.log(res.location ? JSON.parse(res.location) : undefined);
         }else {
           Taro.showToast({ title: '加载失败', icon: 'none' })
         }
@@ -76,20 +82,6 @@ export default function PostEdit() {
       }
     }
   })
-  // 计算文件的 SHA1 哈希值
-
-
-  // const calculateFileSha1 = async (filePath: string): Promise<string> => {
-  //   try {
-  //     const fileContent = await Taro.getFileSystemManager().readFileSync(filePath, 'binary');
-  //     const wordArray = CryptoJS.lib.WordArray.create(fileContent);
-  //     const hash = CryptoJS.SHA1(wordArray).toString();
-  //     console.log('File SHA1:', hash);
-  //     return hash;
-  //   } catch (error) {
-  //     throw new Error('计算文件哈希值失败');
-  //   }
-  // };
 
   // 表单验证
   const validate = () => {
@@ -102,7 +94,7 @@ export default function PostEdit() {
       newErrors.content = '请输入内容'
     }
     if (formData.images.length === 0 && !formData.video) {
-      newErrors.images = '请至少上传一张图片或者一个视频'
+      newErrors.images = '请至少上传1张图片或者一个视频'
     }
 
     setErrors(newErrors)
@@ -159,7 +151,6 @@ export default function PostEdit() {
 
       const videoUrl = JSON.parse(uploadRes.data).video.cdnUrl;
       const videoCoverUrl = JSON.parse(uploadRes.data).thumbnail.cdnUrl;
-      console.log(videoCoverUrl)
       setFormData(prev => ({
         ...prev,
         video: videoUrl,
@@ -213,6 +204,7 @@ export default function PostEdit() {
         images: formData.images,
         video: formData.video,
         quickTag: mergeLines(formData.quickTag, PendingLine),
+        location: formData.location ? JSON.stringify(formData.location) : '',
       })
 
       if (res.success) {
@@ -250,7 +242,7 @@ export default function PostEdit() {
         {errors.title && <Text className='text-red-500 text-sm mt-1'>{errors.title}</Text>}
       </View>
 
-      {/* 内容输入 */}
+      {/* 内容���入 */}
       <View className='mb-4'>
         <Text className='block mb-2 text-gray-700'>内容</Text>
         <Textarea
@@ -325,6 +317,14 @@ export default function PostEdit() {
         )}
       </View>
 
+      {/* 地址选择器 */}
+      <View className='mb-6'>
+        <Text className='block mb-2 text-gray-700'>分享你的旅行地点</Text>
+        <LocationPicker
+          value={formData.location}
+          onChange={(location) => setFormData(prev => ({ ...prev, location }))}
+        />
+      </View>
       {/* 提交按钮 */}
       <Button
         className='w-full bg-blue-500 text-white rounded-full py-2'
@@ -336,3 +336,4 @@ export default function PostEdit() {
     </View>
   )
 }
+
