@@ -36,13 +36,19 @@ const requestInterceptor = function (chain) {
   })
 }
 
+
+interface RequestOptions extends Omit<Taro.request.Option, 'url'> {
+  url: string
+  _retry?: boolean
+  redirectOnAuth?: boolean // 新增：401时是否需要跳转登录页
+}
+
 // 响应拦截器
 const responseInterceptor = function (chain) {
   const requestParams = chain.requestParams;
-
+  console.log(requestParams);
 
   return chain.proceed(requestParams).then(async res => {
-    // 检查是否是401/403且未重试过，并且不是刷新token的请求本身
     const errorCode = res.data?.errorCode;
     if (
       (res.statusCode === 401 || res.statusCode === 403 || res.data?.statusCode === 401) &&
@@ -68,21 +74,17 @@ const responseInterceptor = function (chain) {
           }
         })
 
-        console.log('refresh res', refreshRes);
-
         // 检查刷新结果
-        const refreshData = refreshRes;
+        const refreshData: RefreshResponse = refreshRes
+        console.log(refreshRes);
 
         if (refreshData?.token) {
-          console.log('refresh res', refreshData);
-          // 保存新token
-          Taro.setStorageSync('token', refreshData.token);
-          Taro.setStorageSync('refreshToken', refreshData.refreshToken);
-          Taro.setStorageSync('userInfo', refreshData.user);
-          // 保存用户ID，方便后续获取完整信息
-          Taro.setStorageSync('userId', refreshData.user.id);
+          // 保存新token并重试原请求
+          Taro.setStorageSync('token', refreshData.token)
+          Taro.setStorageSync('refreshToken', refreshData.refreshToken)
+          Taro.setStorageSync('userInfo', refreshData.user)
+          Taro.setStorageSync('userId', refreshData.user.id)
 
-          // 使用新token重试原请求并等待结果
           const retryRes = await request({
             ...requestParams,
             url: requestParams.url.replace(BASE_URL, ''),
@@ -96,17 +98,18 @@ const responseInterceptor = function (chain) {
           throw new Error('Token refresh failed')
         }
       } catch (error) {
-        // 刷新失败，清除用户信息并跳转登录页
-        console.error('Token refresh failed:', error)
+        // 刷新失败时，根据 redirectOnAuth 决定是否跳转
         Taro.removeStorageSync('token')
         Taro.removeStorageSync('refreshToken')
         Taro.removeStorageSync('userInfo')
-        Taro.navigateTo({ url: '/pages/login/index' })
+
+        if (requestParams.data.redirectOnAuth) {
+          Taro.navigateTo({ url: '/pages/login/index' })
+        }
         return Promise.reject(error)
       }
     }
 
-    // 其他错误直接返回
     if (res.statusCode >= 400) {
       return Promise.reject(res.data)
     }
@@ -122,11 +125,6 @@ const responseInterceptor = function (chain) {
 Taro.addInterceptor(requestInterceptor)
 Taro.addInterceptor(responseInterceptor)
 
-// 封装请求方法
-interface RequestOptions extends Omit<Taro.request.Option, 'url'> {
-  url: string
-  _retry?: boolean
-}
 
 export const request = (options: RequestOptions) => {
   return Taro.request({

@@ -44,7 +44,7 @@ export const updateLocalUserInfo = async (): Promise<UserResponse> => {
 // 获取用户访问过的游记ID
 export const getUserHistory = async (): Promise<{ success: boolean; data?: any[]; error?: any }> => {
   try {
-    const res = await get('/user-history/detailed');
+    const res = await get('/user-history/detailed', { redirectOnAuth: true });
     return { success: true, data: res };
   } catch (error) {
     return { success: false, error };
