@@ -1,5 +1,5 @@
 import { View } from '@tarojs/components'
-import { useLoad } from '@tarojs/taro'
+import Taro, { useLoad, usePullDownRefresh, useReachBottom } from '@tarojs/taro'
 import { useState } from 'react'
 import TabBar from '../../components/TabBar'
 import PostCard from '../../components/PostCard'
@@ -15,11 +15,46 @@ interface Post {
 
 export default function Index () {
   const [posts, setPosts] = useState<Post[]>([])
+  const [hasMore, setHasMore] = useState<boolean>(true)
+  const [totalPage, setTotalPage] = useState<number>(0)
+  const [nowPage, setNowPage] = useState<number>(1)
+  const [isLoading, setIsLoading] = useState<boolean>(false)
 
-  useLoad(async () => {
-    const res = await fetchApprovedPosts();
-    if (res.success && res.data) {
-      setPosts(res.data)
+  const loadPosts = async (page: number, isRefresh: boolean = false) => {
+    if (isLoading) return
+
+    setIsLoading(true)
+    try {
+      const res = await fetchApprovedPosts({ page, limit: 6 }) // 增加 limit 参数
+      if (res.success && res.data) {
+        setPosts(prev => isRefresh ? res.data.items : [...prev, ...res.data.items])
+        setHasMore(res.data.hasMore)
+        setTotalPage(res.data.totalPages)
+        setNowPage(res.data.page)
+      }
+    } catch (error) {
+      console.error('加载失败:', error)
+      Taro.showToast({
+        title: '加载失败',
+        icon: 'error'
+      })
+    } finally {
+      setIsLoading(false)
+    }
+  }
+
+  useLoad(() => {
+    loadPosts(1, true)
+  })
+
+  usePullDownRefresh(async () => {
+    await loadPosts(1, true)
+    Taro.stopPullDownRefresh()
+  })
+
+  useReachBottom(() => {
+    if (hasMore && !isLoading) {
+      loadPosts(nowPage + 1)
     }
   })
 
@@ -43,6 +78,20 @@ export default function Index () {
             <View className='text-center text-gray-500'>暂无游记</View>
           )}
         </View>
+
+        {/*加载状态*/}
+        {isLoading && (
+          <View className='text-center py-4 text-gray-500'>
+            加载中...
+          </View>
+        )}
+
+        {/*没有更多数据*/}
+        {!hasMore && posts.length > 0 && (
+          <View className='text-center py-4 text-gray-500'>
+            没有更多了
+          </View>
+        )}
       </View>
 
       <TabBar current='home' />

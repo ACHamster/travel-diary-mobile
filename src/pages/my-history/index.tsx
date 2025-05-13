@@ -9,7 +9,6 @@ export default function MyHistory() {
   useEffect(() => {
     async function fetchHistory() {
       const historyRes = await getUserHistory();
-      console.log(historyRes);
       if (historyRes.success && historyRes.data) {
         setHistoryPosts(historyRes.data);
       }

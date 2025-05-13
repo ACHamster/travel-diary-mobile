@@ -34,7 +34,7 @@ export default function PostCard({ post }: PostCardProps) {
   }
 
   return (
-    <View className='w-full mb-4 bg-white' onClick={handlePostClick}>
+    <View className='w-full mb-2 bg-white' onClick={handlePostClick}>
       {/* 游记封面图 */}
       <View className='relative'>
         <Image
@@ -57,7 +57,7 @@ export default function PostCard({ post }: PostCardProps) {
       </View>
 
       {/* 作者信息与浏览量区域 */}
-      <View className='px-1 flex justify-between items-center'>
+      <View className='px-1 flex justify-between items-center pb-1'>
         {/* 左侧：作者头像和信息（两行显示） */}
         <View className='flex items-center'>
           {/* 作者头像 */}
@@ -69,7 +69,7 @@ export default function PostCard({ post }: PostCardProps) {
 
           {/* 作者名和日期（垂直排列） */}
           <View className='flex flex-col justify-center'>
-            <Text className='text-sm font-medium'>{post.author.username}</Text>
+            <Text className='text-xs text-gray-500'>{post.author.username}</Text>
             <Text className='text-xs text-gray-400'>{formatDate(post.date)}</Text>
           </View>
         </View>
