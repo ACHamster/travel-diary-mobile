@@ -8,6 +8,8 @@ export default defineAppConfig({
     'pages/post-edit/index',
     'pages/my-history/index',
     'pages/my-favorite/index',
+    'pages/settings/index',
+    'pages/register/index',
   ],
   window: {
     backgroundTextStyle: 'light',

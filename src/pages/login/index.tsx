@@ -91,10 +91,7 @@ export default function Login() {
               还没有账号？
               <Text
                 className='text-blue-500 hover:text-blue-600'
-                onClick={() => Taro.showToast({
-                  title: '注册功能开发中',
-                  icon: 'none'
-                })}
+                onClick={() => Taro.navigateTo({ url: '/pages/register/index' })}
               >
                 立即注册
               </Text>

@@ -22,12 +22,14 @@ export default function Profile() {
     try {
       setLoading(true)
       const storedUserInfo = Taro.getStorageSync('userInfo')
+      console.log('Stored User Info:', storedUserInfo)
 
       if (storedUserInfo) {
         // 先设置已存储的用户信息
         setUserInfo(storedUserInfo)
         // 然后尝试更新用户信息
         const { success, data } = await updateLocalUserInfo()
+        console.log(data);
         if (success && data) {
           setUserInfo(data)
         }
@@ -61,6 +63,10 @@ export default function Profile() {
 
   const navigateToFavorites = () => {
     Taro.navigateTo({ url: '/pages/my-favorite/index' })
+  }
+
+  const navigateToSettings = () => {
+    Taro.navigateTo({ url: '/pages/settings/index' })
   }
 
   return (
@@ -139,9 +145,12 @@ export default function Profile() {
           </View>
           <Text className='text-gray-400'>❯</Text>
         </View>
-        <View className='p-4 flex justify-between items-center'>
+        <View
+          className='p-4 flex justify-between items-center'
+          onClick={navigateToSettings}
+        >
           <View className='flex items-center'>
-            <Image src={settingIcon} className='w-5 h-5' />
+            <Image src={settingIcon} className='w-5 h-5 mr-2' />
             <View>设置</View>
           </View>
           <View className='text-gray-400'>❯</View>

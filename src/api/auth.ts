@@ -95,3 +95,12 @@ export const logout = async (): Promise<AuthResponse> => {
     return { success: false, error }
   }
 }
+
+export const signUp = async (data) => {
+  try {
+    const res = await post('/auth/signup', data)
+    return { success: true, data: res }
+  } catch (error) {
+    return { success: false, error }
+  }
+}

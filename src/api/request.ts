@@ -38,14 +38,17 @@ const requestInterceptor = function (chain) {
 
 // 响应拦截器
 const responseInterceptor = function (chain) {
-  const requestParams = chain.requestParams
+  const requestParams = chain.requestParams;
+
 
   return chain.proceed(requestParams).then(async res => {
     // 检查是否是401/403且未重试过，并且不是刷新token的请求本身
+    const errorCode = res.data?.errorCode;
     if (
       (res.statusCode === 401 || res.statusCode === 403 || res.data?.statusCode === 401) &&
       !requestParams._retry &&
-      !requestParams.url.includes('/auth/refresh')
+      !requestParams.url.includes('/auth/refresh') &&
+      errorCode !== "USER_ALREADY_REGISTERED"
     ) {
       requestParams._retry = true
 

@@ -12,17 +12,17 @@ interface UserResponse {
 export const getUserInfo = async (id: string | number): Promise<UserResponse> => {
   try {
     const res = await get(`/user/info/${id}`)
-    if (res.statusCode === 200) {
+    if (res) {
       // 更新本地存储的用户信息，合并现有信息和新获取的信息
       const currentUserInfo = Taro.getStorageSync('userInfo') || {}
       const newUserInfo = {
         ...currentUserInfo,
-        ...res.data
+        ...res
       }
       Taro.setStorageSync('userInfo', newUserInfo)
       return { success: true, data: newUserInfo }
     }
-    return { success: false, error: res.data }
+    return { success: false, error: res }
   } catch (error) {
     return { success: false, error }
   }
