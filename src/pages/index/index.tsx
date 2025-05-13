@@ -17,7 +17,7 @@ export default function Index () {
   const [posts, setPosts] = useState<Post[]>([])
 
   useLoad(async () => {
-    const res = await fetchApprovedPosts()
+    const res = await fetchApprovedPosts();
     if (res.success && res.data) {
       setPosts(res.data)
     }
@@ -35,9 +35,13 @@ export default function Index () {
       {/*游记列表*/}
       <View className='p-4 bg-gray-100 min-h-screen'>
         <View className='grid grid-cols-2 gap-2'>
-          {posts.map(post => (
-            <PostCard key={post.id} post={post} />
-          ))}
+          {posts.length > 0 ? (
+            posts.map(post => (
+              <PostCard key={post.id} post={post} />
+            ))
+          ) : (
+            <View className='text-center text-gray-500'>暂无游记</View>
+          )}
         </View>
       </View>
 

@@ -62,6 +62,14 @@ export default function PostDetail() {
     }
   };
 
+  const handleImageClick = (currentImage: string) => {
+    // 预览图片，传入当前点击的图片和所有图片数组
+    Taro.previewImage({
+      current: currentImage, // 当前显示图片的链接
+      urls: post?.images || [], // 需要预览的图片链接列表
+    });
+  };
+
   if (!post) {
     return <View className='loading'>加载中...</View>
   }
@@ -99,6 +107,7 @@ export default function PostDetail() {
                 mode='aspectFill'
                 className='post-image'
                 src={image}
+                onClick={() => handleImageClick(image)}
               />
             </SwiperItem>
           ))}
