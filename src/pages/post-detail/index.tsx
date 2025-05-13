@@ -1,13 +1,17 @@
 import { useState } from 'react'
+import Taro, { useLoad } from '@tarojs/taro'
 import { View, Text, Image, Swiper, SwiperItem, Video } from '@tarojs/components'
-import { useLoad } from '@tarojs/taro'
 import { get } from '../../api/request'
 import './index.css'
-import {addUserHistory} from "../../api/user";
+import {addUserHistory, toggleFavorite} from "../../api/user";
+import favoriteIcon from '../../icons/favorite.png';
+import favoritedIcon from '../../icons/favorited.png';
+import shareIcon from '../../icons/share.png';
 
 interface Author {
-  id: number
-  username: string
+  id: number;
+  username: string;
+  avatar: string;
 }
 
 interface Post {
@@ -21,6 +25,7 @@ interface Post {
   auditStatus: string
   rejectReason: string | null
   author: Author
+  isFavorited?: boolean
 }
 
 export default function PostDetail() {
@@ -38,12 +43,31 @@ export default function PostDetail() {
     }
   })
 
+  const handleFavoriteToggle = async () => {
+    if (post) {
+      try {
+        await toggleFavorite(post.id);
+        setPost({ ...post, isFavorited: !post.isFavorited });
+      } catch (error) {
+        console.error('Failed to toggle favorite:', error);
+      }
+    }
+  };
+
+  const handleShare = () => {
+    if (post) {
+      Taro.showShareMenu({
+        withShareTicket: true,
+      });
+    }
+  };
+
   if (!post) {
     return <View className='loading'>加载中...</View>
   }
 
   return (
-    <View className='post-detail'>
+    <View className='post-detail flex flex-col min-h-screen'>
       <View className='w-full flex items-center'>
         <Image src={post.author.avatar} className='w-6 h-6 rounded-full' />
         <View className='font-xl ml-4'>{post.author.username}</View>
@@ -83,14 +107,26 @@ export default function PostDetail() {
 
       {/* 作者信息 */}
 
-
       {/* 标题和内容 */}
-      <View className='post-content'>
-        <Text className='post-title'>{post.title}</Text>
-        <Text className='post-text'>{post.content}</Text>
+      <View className='post-content flex-1 px-4 py-2'>
+        <Text className='post-title text-xl font-bold mb-2'>{post.title}</Text>
+        <Text className='post-text text-base leading-relaxed'>{post.content}</Text>
       </View>
-      <View className='post-date px-2'>
+      <View className='post-date text-sm text-gray-500 px-4 mb-4'>
         {new Date(post.date).toLocaleDateString('zh-CN')}
+      </View>
+
+      <View className='bottom-bar fixed bottom-0 left-0 w-full bg-white shadow-md flex justify-around items-center py-2'>
+        <Image
+          src={post.isFavorited ? favoritedIcon : favoriteIcon}
+          className='icon w-6 h-6'
+          onClick={handleFavoriteToggle}
+        />
+        <Image
+          src={shareIcon}
+          className='icon w-6 h-6'
+          onClick={handleShare}
+        />
       </View>
     </View>
   )

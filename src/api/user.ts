@@ -71,3 +71,14 @@ export const addUserHistory = async (recordId: string): Promise<{ success: boole
     return { success: false, error };
   }
 }
+
+
+// 切换收藏状态
+export const toggleFavorite = async (postId: string): Promise<{ success: boolean; error?: any }> => {
+  try {
+    await post('/user-favorites/toggle', { data: { postId } });
+    return { success: true };
+  } catch (error) {
+    return { success: false, error };
+  }
+};
