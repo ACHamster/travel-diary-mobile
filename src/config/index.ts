@@ -8,8 +8,8 @@ const config = {
 }
 
 // 根据编译时的环境变量选择配置
-export const ENV = 'development' // 在小程序环境中，我们默认使用开发环境配置
-// export const ENV = 'production' // 在小程序环境中，我们默认使用生产环境配置
+// export const ENV = 'development'
+export const ENV = 'production'
 export const { BASE_URL } = config[ENV]
 
 export default config
