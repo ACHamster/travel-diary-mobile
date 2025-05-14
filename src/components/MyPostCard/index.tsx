@@ -1,5 +1,4 @@
 import {View, Image, Text, Video} from '@tarojs/components';
-// import { DeleteOutlined, WarningOutlined, EyeOutlined } from '@taroify/icons';
 import editIcon from '../../icons/edit.png';
 import deleteIcon from '../../icons/delete.png';
 import {
@@ -10,6 +9,7 @@ import {
   VideoLine,
   includeSomeLine,
 } from '../../lib/quick-tag';
+import videoIcon from '../../icons/videocam.png';
 
 interface MyPostCardProps {
   post: {
@@ -17,6 +17,7 @@ interface MyPostCardProps {
     title: string;
     date: string;
     images: string[];
+    coverImage: string;
     quickTag: number;
     rejectReason?: string | null;
     viewCount: number;
@@ -50,20 +51,17 @@ export default function MyPostCard({ post, onDelete, onEdit }: MyPostCardProps) 
     <View className='w-full mb-4 bg-white rounded-lg shadow-sm overflow-hidden'>
       <View className='relative'>
         {/* 游记封面图或视频 */}
-        {includeSomeLine(post.quickTag, VideoLine) ? (
-          <Video
-            src={post.images[0]} // 假设视频路径存储在 images 的第一个元素
-            className='w-full aspect-[3/2] object-cover'
-            controls
-            autoplay={false}
-            loop={false}
-            muted={false}
-          />
-        ) : (
+        <Image
+          src={post.coverImage}
+          className='w-full aspect-[3/2] object-cover'
+          mode='aspectFill'
+        />
+        {/* 视频标识 */}
+        {includeSomeLine(post.quickTag, VideoLine) && (
           <Image
-            src={post.images && post.images.length > 0 ? post.images[0] : ''}
-            className='w-full aspect-[3/2] object-cover'
-            mode='aspectFill'
+            src={videoIcon}
+            className='absolute top-2 left-2 w-5 h-5'
+            mode='aspectFit'
           />
         )}
         {/* 状态标签 */}
@@ -99,12 +97,14 @@ export default function MyPostCard({ post, onDelete, onEdit }: MyPostCardProps) 
 
           {/* 操作按钮 */}
           <View className='flex items-center'>
-            <View
-              className='mr-3 w-5 h-5 rounded-full bg-gray-100 flex items-center justify-center'
-              onClick={() => onEdit(post.id)}
-            >
-              <Image src={editIcon} className='w-4 h-4' />
-            </View>
+            {!includeSomeLine(post.quickTag, ApprovedLine) && (
+              <View
+                className='mr-3 w-5 h-5 rounded-full bg-gray-100 flex items-center justify-center'
+                onClick={() => onEdit(post.id)}
+              >
+                <Image src={editIcon} className='w-4 h-4' />
+              </View>
+            )}
             <View
               className='mr-3 w-5 h-5 rounded-full bg-gray-100 flex items-center justify-center'
               onClick={() => onDelete(post.id)}

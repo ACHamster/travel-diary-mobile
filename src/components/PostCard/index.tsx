@@ -20,7 +20,6 @@ interface PostCardProps {
 }
 
 export default function PostCard({ post }: PostCardProps) {
-
   // 格式化日期为 YYYY-MM-DD 格式
   const formatDate = (dateString: string) => {
     const date = new Date(dateString);

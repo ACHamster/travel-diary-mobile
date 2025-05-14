@@ -7,11 +7,17 @@ import {addUserHistory, toggleFavorite} from "../../api/user";
 import favoriteIcon from '../../icons/favorite.png';
 import favoritedIcon from '../../icons/favorited.png';
 import shareIcon from '../../icons/share.png';
+import locationIcon from '../../icons/pin_drop.png';
 
 interface Author {
   id: number;
   username: string;
   avatar: string;
+}
+
+interface Location {
+  province: string
+  city: string
 }
 
 interface Post {
@@ -22,6 +28,7 @@ interface Post {
   description: string | null
   images: string[]
   video: string
+  location?: string // 实际存储的是 Location 的 JSON 字符串
   auditStatus: string
   rejectReason: string | null
   author: Author
@@ -70,73 +77,107 @@ export default function PostDetail() {
     });
   };
 
+  const parseLocation = (locationStr?: string): Location | null => {
+    if (!locationStr) return null;
+    try {
+      return JSON.parse(locationStr) as Location;
+    } catch {
+      return null;
+    }
+  }
+
+  const formatLocation = (location: Location): string => {
+    if (location.province === location.city) {
+      return location.city;
+    }
+    return `${location.province} ${location.city}`;
+  }
+
   if (!post) {
     return <View className='loading'>加载中...</View>
   }
 
   return (
-    <View className='post-detail flex flex-col min-h-screen'>
-      <View className='w-full flex items-center'>
-        <Image src={post.author.avatar} className='w-6 h-6 rounded-full' />
-        <View className='font-xl ml-4'>{post.author.username}</View>
-      </View>
-      {/* 图片轮播，视频作为第一个 */}
+    <View className='flex flex-col min-h-screen bg-white'>
+      {/* 图片/视频展示区域 */}
       {(post.video || (post.images && post.images.length > 0)) && (
-        <Swiper
-          className='post-images max-h-[80vh]'
-          indicatorDots
-          circular
-          autoplay={false}
-          indicatorColor='#999'
-          indicatorActiveColor='#333'
-        >
-          {post.video && (
-            <SwiperItem className='flex items-center'>
-              <Video
-                src={post.video}
-                controls
-                showFullscreenBtn
-                autoplay={false}
-                className='w-full rounded'
-              />
-            </SwiperItem>
-          )}
-          {post.images.map((image, index) => (
-            <SwiperItem key={index} className='flex items-center'>
-              <Image
-                mode='aspectFill'
-                className='post-image'
-                src={image}
-                onClick={() => handleImageClick(image)}
-              />
-            </SwiperItem>
-          ))}
-        </Swiper>
+        <View className='w-full h-[75vh]'>
+          <Swiper
+            className='w-full h-full'
+            indicatorDots
+            circular
+            autoplay={false}
+            indicatorColor='#999'
+            indicatorActiveColor='#333'
+          >
+            {post.video && (
+              <SwiperItem>
+                <Video
+                  src={post.video}
+                  controls
+                  showFullscreenBtn
+                  autoplay={false}
+                  className='w-full h-full object-cover'
+                />
+              </SwiperItem>
+            )}
+            {post.images.map((image, index) => (
+              <SwiperItem key={index} className='w-full h-full flex items-center justify-center'>
+                <Image
+                  mode='aspectFill'
+                  className='w-full h-full'
+                  src={image}
+                  onClick={() => handleImageClick(image)}
+                />
+              </SwiperItem>
+            ))}
+          </Swiper>
+        </View>
       )}
 
-      {/* 作者信息 */}
+      {/* 内容区域 */}
+      <View className='flex-1 px-4 pt-4'>
+        <View className='flex items-center mb-4'>
+          <Image src={post.author.avatar} className='w-8 h-8 rounded-full' />
+          <Text className='ml-2 font-semibold'>{post.author.username}</Text>
+        </View>
 
-      {/* 标题和内容 */}
-      <View className='post-content flex-1 px-4 py-2'>
-        <Text className='post-title text-xl font-bold mb-2'>{post.title}</Text>
-        <Text className='post-text text-base leading-relaxed'>{post.content}</Text>
-      </View>
-      <View className='post-date text-sm text-gray-500 px-4 mb-4'>
-        {new Date(post.date).toLocaleDateString('zh-CN')}
+        {parseLocation(post.location) && (
+          <View className='inline-flex items-center bg-gray-100 rounded-full px-3 py-1 mb-3'>
+            <Image src={locationIcon} className='w-4 h-4 mr-1' />
+            <Text className='text-sm text-gray-600'>
+              {formatLocation(parseLocation(post.location)!)}
+            </Text>
+          </View>
+        )}
+
+        <View className='mb-4'>
+          <Text className='text-xl font-bold'>{post.title}</Text>
+        </View>
+
+        <View className='mb-4 text-base leading-relaxed text-gray-700'>
+          <Text>{post.content}</Text>
+        </View>
+
+        <View className='text-sm text-gray-500 mb-16'>
+          {new Date(post.date).toLocaleDateString('zh-CN')}
+        </View>
       </View>
 
-      <View className='bottom-bar fixed bottom-0 left-0 w-full bg-white shadow-md flex justify-around items-center py-2'>
+      {/* 底部操作栏 */}
+      <View className='fixed bottom-0 left-0 w-full bg-white border-t border-gray-200 flex justify-around items-center py-3 px-4'>
         <Image
           src={post.isFavorited ? favoritedIcon : favoriteIcon}
-          className='icon w-6 h-6'
+          className='w-6 h-6'
           onClick={handleFavoriteToggle}
         />
         <Image
           src={shareIcon}
-          className='icon w-6 h-6'
+          className='w-6 h-6'
           onClick={handleShare}
         />
       </View>
     </View>
   )
 }
+
