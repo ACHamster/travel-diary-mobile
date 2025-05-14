@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import Taro, { useLoad } from '@tarojs/taro'
+import Taro, { useLoad, useShareAppMessage } from '@tarojs/taro'
 import { View, Text, Image, Swiper, SwiperItem, Video } from '@tarojs/components'
 import { get } from '../../api/request'
 import './index.css'
@@ -35,8 +35,30 @@ interface Post {
   isFavorited?: boolean
 }
 
+const isUserLoggedIn = () => {
+  return Taro.getStorageSync('token') !== '';
+};
+
 export default function PostDetail() {
   const [post, setPost] = useState<Post | null>(null)
+
+  // 修改分享配置
+  useShareAppMessage((res) => {
+    if (res.from === 'button') {
+      // 来自页面内转发按钮
+      return {
+        title: post?.title || '精彩游记',
+        path: post ? `/pages/post-detail/index?id=${post.id}` : '/pages/index/index',
+        imageUrl: post?.images?.[0] || '',
+      }
+    }
+    // 来自右上角转发菜单
+    return {
+      title: post?.title || '精彩游记',
+      path: post ? `/pages/post-detail/index?id=${post.id}` : '/pages/index/index',
+      imageUrl: post?.images?.[0] || '',
+    }
+  })
 
   useLoad(async (options) => {
     if (options.id) {
@@ -51,6 +73,23 @@ export default function PostDetail() {
   })
 
   const handleFavoriteToggle = async () => {
+    if (!isUserLoggedIn()) {
+      Taro.showModal({
+        title: '提示',
+        content: '请先登录后再收藏',
+        confirmText: '去登录',
+        cancelText: '取消',
+        success: function (res) {
+          if (res.confirm) {
+            Taro.navigateTo({
+              url: '/pages/login/index'
+            });
+          }
+        }
+      });
+      return;
+    }
+
     if (post) {
       try {
         await toggleFavorite(post.id);
@@ -62,12 +101,13 @@ export default function PostDetail() {
   };
 
   const handleShare = () => {
-    if (post) {
-      Taro.showShareMenu({
-        withShareTicket: true,
-      });
-    }
-  };
+    // 显示一个提示
+    Taro.showToast({
+      title: '点击右上角转发给好友',
+      icon: 'none',
+      duration: 2000
+    })
+  }
 
   const handleImageClick = (currentImage: string) => {
     // 预览图片，传入当前点击的图片和所有图片数组

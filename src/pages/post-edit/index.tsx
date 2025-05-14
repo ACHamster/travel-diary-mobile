@@ -196,6 +196,7 @@ export default function PostEdit() {
 
     setIsSubmitting(true)
     try {
+      console.log(formData.location);
       const res = await createPost({
         id: formData.id,
         title: formData.title,

@@ -33,12 +33,12 @@ export default function PostCard({ post }: PostCardProps) {
   }
 
   return (
-    <View className='w-full mb-2 bg-white' onClick={handlePostClick}>
+    <View className='w-full mb-2 bg-white flex flex-col' onClick={handlePostClick}>
       {/* 游记封面图 */}
       <View className='relative'>
         <Image
           src={post.coverImage || post.images[0]}
-          className='w-full aspect-square rounded-t-lg object-cover mb-2'
+          className='w-full aspect-square rounded-t-lg object-cover'
           mode='aspectFill'
         />
         {includeSomeLine(post.quickTag, VideoLine) && (
@@ -50,35 +50,26 @@ export default function PostCard({ post }: PostCardProps) {
         )}
       </View>
 
-      {/* 标题区域 */}
-      <View className='px-1 mb-2'>
-        <Text className='text-sm font-medium line-clamp-2'>{post.title}</Text>
+      {/* 标题区域 - 固定高度确保两行 */}
+      <View className='px-2 py-2'>
+        <Text className='text-sm font-medium line-clamp-2 min-h-[2.5em]'>{post.title}</Text>
       </View>
 
-      {/* 作者信息与浏览量区域 */}
-      <View className='px-1 flex justify-between items-center pb-1'>
-        {/* 左侧：作者头像和信息（两行显示） */}
+      {/* 作者信息与浏览量区域 - 固定在底部 */}
+      <View className='mt-auto px-2 py-2 border-t border-gray-100'>
         <View className='flex items-center'>
-          {/* 作者头像 */}
           <Image
             src={post.author.avatar}
             className='w-6 h-6 rounded-full mr-2'
             mode='aspectFill'
           />
-
-          {/* 作者名和日期（垂直排列） */}
           <View className='flex flex-col justify-center'>
             <Text className='text-xs text-gray-500'>{post.author.username}</Text>
             <Text className='text-xs text-gray-400'>{formatDate(post.date)}</Text>
           </View>
         </View>
-
-        {/* 右侧：浏览量 */}
-        <View className='flex flex-col items-center'>
-          <Icon type='search' size={10} />
-          <Text className='text-xs text-gray-400 mt-0.5'>{post.viewCount}</Text>
-        </View>
       </View>
     </View>
   )
 }
+

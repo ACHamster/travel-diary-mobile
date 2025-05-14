@@ -27,6 +27,7 @@ export default function LocationPicker({ value, onChange }: LocationPickerProps)
     const firstCity = provinces[e.detail.value].cities[0]
     setSelectedCity(firstCity)
     onChange?.({ province, city: firstCity })
+    console.log(province,firstCity);
   }
 
   const handleCityChange = (e) => {
