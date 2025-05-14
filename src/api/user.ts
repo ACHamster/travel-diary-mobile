@@ -54,7 +54,7 @@ export const getUserHistory = async (): Promise<{ success: boolean; data?: any[]
 // 获取用户收藏
 export const getUserFavorites = async (): Promise<{ success: boolean; data?: any[]; error?: any }> => {
   try {
-    const res = await get('/user-favorites/detailed');
+    const res = await get('/user-favorites/detailed', { redirectOnAuth: true });
     return { success: true, data: res };
   } catch (error) {
     return { success: false, error };

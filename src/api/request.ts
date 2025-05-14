@@ -46,9 +46,20 @@ interface RequestOptions extends Omit<Taro.request.Option, 'url'> {
 // 响应拦截器
 const responseInterceptor = function (chain) {
   const requestParams = chain.requestParams;
-  console.log(requestParams);
+  const isLoginRequest = requestParams.url.includes('/auth/signin');
 
   return chain.proceed(requestParams).then(async res => {
+    // 处理登录接口的错误
+    if (isLoginRequest && (res.statusCode === 401 || res.statusCode === 403)) {
+      const errorMessage = res.data?.message || '用户名或密码错误';
+      Taro.showToast({
+        title: errorMessage,
+        icon: 'none',
+        duration: 2000
+      });
+      return Promise.reject(res.data);
+    }
+
     const errorCode = res.data?.errorCode;
     if (
       (res.statusCode === 401 || res.statusCode === 403 || res.data?.statusCode === 401) &&
@@ -56,7 +67,7 @@ const responseInterceptor = function (chain) {
       !requestParams.url.includes('/auth/refresh') &&
       errorCode !== "USER_ALREADY_REGISTERED"
     ) {
-      requestParams._retry = true
+      requestParams._retry = true;
 
       try {
         // 尝试刷新token
@@ -75,9 +86,7 @@ const responseInterceptor = function (chain) {
         })
 
         // 检查刷新结果
-        const refreshData: RefreshResponse = refreshRes
-        console.log(refreshRes);
-
+        const refreshData = refreshRes.data;
         if (refreshData?.token) {
           // 保存新token并重试原请求
           Taro.setStorageSync('token', refreshData.token)
@@ -94,16 +103,14 @@ const responseInterceptor = function (chain) {
             }
           })
           return retryRes.data
-        } else {
-          throw new Error('Token refresh failed')
         }
+        throw new Error('Token refresh failed')
       } catch (error) {
-        // 刷新失败时，根据 redirectOnAuth 决定是否跳转
         Taro.removeStorageSync('token')
         Taro.removeStorageSync('refreshToken')
         Taro.removeStorageSync('userInfo')
 
-        if (requestParams.data.redirectOnAuth) {
+        if (requestParams.data?.redirectOnAuth) {
           Taro.navigateTo({ url: '/pages/login/index' })
         }
         return Promise.reject(error)
@@ -111,6 +118,12 @@ const responseInterceptor = function (chain) {
     }
 
     if (res.statusCode >= 400) {
+      const errorMessage = res.data?.message || '请求失败';
+      Taro.showToast({
+        title: errorMessage,
+        icon: 'none',
+        duration: 2000
+      });
       return Promise.reject(res.data)
     }
 
