@@ -89,3 +89,13 @@ export const deletePost = async (id: string | number): Promise<PostResponse> => 
     return { success: false, error }
   }
 }
+
+// 搜索游记
+export const searchPosts = async (keyword: string): Promise<PostResponse> => {
+  try {
+    const res = await get(`/posts/list/approved/search`, { keyword });
+    return { success: true, data: res };
+  } catch (error) {
+    return { success: false, error };
+  }
+};
