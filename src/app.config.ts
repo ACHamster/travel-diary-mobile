@@ -17,6 +17,9 @@ export default defineAppConfig({
     navigationBarTitleText: 'WeChat',
     navigationBarTextStyle: 'black'
   },
+  // 添加全局分享配置
+  enableShareAppMessage: true,
+  enableShareTimeline: true,
   tabBar: {
     custom: true,
     list: [
@@ -29,5 +32,12 @@ export default defineAppConfig({
         text: '我的'
       }
     ]
-  }
+  },
+  // 修改分享配置
+  permission: {
+    'scope.userLocation': {
+      desc: '你的位置信息将用于小程序位置接口的效果展示'
+    }
+  },
+  requiredPrivateInfos: ['chooseLocation'],
 })
