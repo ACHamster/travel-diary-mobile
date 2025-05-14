@@ -9,7 +9,7 @@ export default function Register() {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
-  const [avatar, setAvatar] = useState('');
+  const [avatar, setAvatar] = useState('https://img.achamster.live/travel%2FTransparent_Akkarin.jpg');
 
   const handleAvatarChange = async () => {
     try {
@@ -105,7 +105,7 @@ export default function Register() {
           <Text className='block text-sm text-gray-600 mb-2'>密码</Text>
           <Input
             className='w-full p-2 border rounded'
-            type='safe-password'
+            type='text'
             password
             placeholder='请输入密码'
             value={password}
@@ -117,8 +117,9 @@ export default function Register() {
           <Text className='block text-sm text-gray-600 mb-2'>确认密码</Text>
           <Input
             className='w-full p-2 border rounded'
-            type='safe-password'
+            type='text'
             placeholder='请再次输入密码'
+            password
             value={confirmPassword}
             onInput={(e) => setConfirmPassword(e.detail.value)}
           />
@@ -128,7 +129,7 @@ export default function Register() {
           <Text className='block text-sm text-gray-600 mb-2'>头像</Text>
           <View className='flex items-center'>
             <Image
-              src={avatar || 'https://via.placeholder.com/100'}
+              src={avatar || 'https://img.achamster.live/travel%2FTransparent_Akkarin.jpg'}
               className='w-16 h-16 rounded-full bg-gray-200 mr-4'
             />
             <Button className='text-blue-500' onClick={handleAvatarChange}>上传头像</Button>

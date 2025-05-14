@@ -29,7 +29,7 @@ export const fetchApprovedPosts = async (params?: { page?: number; limit?: numbe
 // 获取当前用户的游记列表
 export const fetchMyPosts = async (): Promise<PostResponse> => {
   try {
-    const res = await get('/posts/my');
+    const res = await get('/posts/my', { redirectOnAuth: true });
     return { success: true, data: res }
   } catch (error) {
     return { success: false, error }
